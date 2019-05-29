@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="eng"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns="http://www.thymeleaf.org">
+<head>
+    <!--/*/ <th:block th:include="fragments/head :: head"></th:block> /*/-->
+    <title>Assign Tasks</title>
+</head>
+
+<body>
+
+<header>
+    <!--/*/ <th:block th:include="fragments/header :: header('assign-tasks')"></th:block> /*/-->
+</header>
+
+<main class="container">
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>Assign tasks</h3>
+        </div>
+
+        <div class="card-body">
+
+            <h4>Choose user</h4>
+
+            <div class="card-deck">
+                <div th:each="user:${users}" class="col-3">
+
+                    <a th:href="${'/assign/' + user.email}" class="btn text-left">
+                        <div class="card mb-3"
+                             th:classappend="${selectedUser!=null and selectedUser.email==user.email} ?'my-button-selected'">
+                            <div class="row">
+
+                                <div class="col-5">
+                                    <img class="card-img-left embed-responsive embed-responsive-3by4"
+                                         th:src="${user.photo}" alt="user photo">
+                                </div>
+
+                                <div class="col-7">
+                                    <div th:text="${user.name}"></div>
+                                    <small>tasks in progress:</small>
+                                    <div th:if="${user.getTasksInProgress().size() gt 0}"
+                                         th:text="${user.getTasksInProgress().size()}">
+                                    </div>
+                                    <div th:if="${user.getTasksInProgress().size()==0}">0</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h4 th:if="${selectedUser==null}">No user is selected</h4>
+            <h4 th:unless="${selectedUser==null}">
+                <span class="text-success"
+                      th:text="${selectedUser.getName() +' is selected'}">
+                </span>
+            </h4>
+
+            <hr class="my-4">
+
+            <div class="row">
+
+                <div class="col-6">
+                    <div class="card mr-2">
+                        <div class="card-header">
+                            <h4 th:text="${selectedUser!=null}?'Tasks In Progres Assigned to '+${selectedUser.getName()}:'Tasks In Progres'"></h4>
+                        </div>
+                        <table class="table table-hover text-left">
+                            <thead class="table-info">
+                            <tr>
+                                <th>Task name</th>
+                                <th>Days left</th>
+                            </tr>
+                            </thead>
+
+                            <tbody th:if="${selectedUser!=null and (selectedUser.getTasksInProgress().size() gt 0)}">
+                            <tr th:each="t:${selectedUser.getTasksInProgress()}">
+
+                                <!--Tasks in  progress-->
+                                <td th:text="${t.name}"></td>
+
+                                <!--Days left-->
+                                <td class="text-center col-1">
+                                    <!--/*/ <th:block th:include="fragments/viewOfDaysLeftToDeadline :: daysLeft(${t})"></th:block> /*/-->
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <!--right card with all free TASKS 1/2 width--------------------------------------->
+                <div class="col-6">
+                    <div class="card ml-2">
+                        <div class="card-header">
+
+                            <h4>Free Tasks</h4>
+                        </div>
+
+                        <table class="my-tab table table-hover text-left">
+
+                            <thead class="table-secondary">
+                            <tr>
+                                <th>Task name</th>
+                                <th>Days left</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="ft:${freeTasks}" th:unless="${freeTasks.size()==0}">
+
+                                <!--Free task name-->
+                                <td th:text="${ft.name}"></td>
+
+                                <!--Days left-->
+                                <td class="text-center col-1">
+                                    <!--/*/ <th:block th:include="fragments/viewOfDaysLeftToDeadline :: daysLeft(${ft})"></th:block> /*/-->
+                                </td>
+
+                                <!--Assign button-->
+                                <td th:if="${selectedUser==null}">
+                                        <span data-toggle="tooltip"
+                                              data-placement="right"
+                                              title="Choose one user to unblock task assigment">
+                                            <a href="#" class="btn btn-outline-success btn-sm mb-2 disabled">Assign</a>
+                                        </span>
+                                </td>
+
+                                <td th:unless="${selectedUser==null}">
+                                    <a th:href="${'/assign/' + selectedUser.getEmail()+'/'+ft.id}"
+                                       class="btn btn-outline-success btn-sm mb-2"
+                                    >Assign</a>
+                                </td>
+                            </tr>
+
+                            <tr th:if="${freeTasks.size()==0}">
+                                <td>There are no tasks to assign</td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <!--/*/ <th:block th:include="fragments/footer :: footer"></th:block> /*/-->
+</footer>
+
+<!--remain scroll position after redirect-->
+<script src="js/main.js"></script>
+
+</body>
+</html>
